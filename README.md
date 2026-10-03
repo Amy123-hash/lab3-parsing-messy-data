@@ -12,7 +12,7 @@
 - `AI_USAGE.md` — documented prompts
 
 ## Usage
-Input: `data/raw/lab3-messy-data/messy_samples.csv`
+Input: messy_samples.csv
 
 ```bash
 python clean_samples_regex.py messy_samples.csv clean_samples_regex.csv
