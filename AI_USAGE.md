@@ -12,7 +12,7 @@
 > (YYYY-MM-DD), sex (M/F/Unknown), enrollment_site (Site A/B/C), and
 > glucose_value_mgdl (convert mmol/L to mg/dL).
 
-No further instructions were given about 2-digit-year handling, how to
+No additional instructions were given about 2-digit-year handling, how to
 treat a blank sex field versus an explicitly-written "unknown," or the
 `*` suffix on two glucose values — deliberately, to see what the tool
 does with real judgment calls it wasn't told the answer to.
@@ -21,16 +21,13 @@ does with real judgment calls it wasn't told the answer to.
 reasoning through each record directly rather than running a script.
 
 **What actually happened, including a correction of an earlier guess:**
-I initially assumed an AI tool would mis-handle the 2-digit-year dates
-(e.g. reading `53` as `2053` instead of `1953`) the way a generic
+At first I assumed an AI tool would mis-handle the 2-digit-year dates
+(e.g. reading `53` as `2053` instead of `1953`) the way a normal
 date-parsing library does by default. When the assistant was actually
 asked to do the extraction and reasoned through each date individually
 instead of applying a library default, it checked the result for
 plausibility (a birthdate in the future doesn't make sense) and got all
-six of those dates right -- matching the regex script exactly. So that
-specific "AI gets confused by short years" story doesn't hold up for a
-careful live pass; it was really a property of a naive default parser,
-not of AI-assisted extraction in general. The real divergences turned
+six of those dates right matching the regex script exactly. The real divergences turned
 out to be:
 
 1. **Sex coding collapses blank and "unknown" together.** My prompt only
@@ -41,7 +38,7 @@ out to be:
    consequence of how the prompt was worded, not a parsing failure.
 2. **The two asterisked glucose values (S0039, S0042) lost their flag
    as structured data.** The assistant noticed the `*` and treated it
-   as a lab-flagged result, and said so in a sentence -- but since the
+   as a lab-flagged result, and said so in a sentence  but since the
    prompt didn't ask for a flag column, that information ended up in
    free-text `notes`, not in a reusable column the way the regex
    script's `flagged` boolean is.
