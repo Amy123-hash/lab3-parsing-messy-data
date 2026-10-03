@@ -2,16 +2,14 @@
 
 ## Agreement / disagreement
 
-The two approaches agree on the large majority of the 60 records:
-sample ID normalization, site normalization, and all dates — including
-the six ambiguous 2-digit-year dates (e.g. `11.24.53`) — matched
-exactly. I expected the AI pass to mis-read those short years as future
-dates (a common failure mode of generic date-parsing libraries), but
-when actually asked to reason through each one, it checked plausibility
-(a birthdate after today doesn't make sense) and landed on the same
-year as the regex script every time. That's worth noting explicitly:
-the "AI gets confused by 2-digit years" story is really about careless
-default parsing, not about AI-assisted extraction in general.
+The two agree on the large majority of the 60 records:
+sample ID normalization, site normalization, and all dates this is including
+the six ambiguous 2-digit-year dates (e.g. `11.24.53`) matched
+exactly. I expected the AI pass to missread those short years as future
+dates, but when actually asked to reason through each one, it checked for
+a birthdate after today doesn't make sense and it had landed on the same
+year as the regex script every time.The AI had gotten confused by 2-digit
+years.
 
 Where they genuinely disagree:
 
@@ -20,10 +18,10 @@ have a truly blank `sex` cell; 14 others spell it out as `unknown` or
 `U`. The regex script preserves that distinction (blank stays blank;
 explicit unknown becomes `U`). The AI-assisted prompt defined only
 three output categories (M/F/Unknown), with no category for "not
-recorded at all" — so both blank and explicit-unknown collapsed into a
-single `Unknown` value. This is a direct consequence of how I worded
-the prompt, not a reasoning failure: an AI tool follows the schema it's
-given, and a vaguely-specified schema erases a real distinction in the
+recorded at all" so both blank and explicit unknown had collapsed into a
+single `Unknown` value. This is a consequence of how I worded
+the prompt, and not reasoning failure: an AI tool follows whats its
+given, and not specified schema erases a real distinction in the
 source data.
 
 **2. The asterisk flag on S0039 and S0042 survives differently.** The
@@ -36,27 +34,26 @@ text to find flagged rows instead of filtering a boolean column.
 
 ## Which caught more edge cases?
 
-Roughly a tie, but for different reasons. Regex caught the asterisk
-and the sex-blank/unknown distinction *because the script was
-explicitly written to check for them* — those checks don't happen by
-accident. The AI pass caught the site-name variants and the ambiguous-
+Regex caught the asterisk and the sex-blank/unknown distinction because 
+the script was explicitly written to check for them those checks don't happen by
+accident. The AI pass caught the site-name variants and the ambiguous
 year dates just as well with far less upfront effort, and did so
 through genuine reasoning (plausibility-checking the result) rather
-than a hard-coded rule. The real lesson isn't "one tool is smarter" —
-it's that **both approaches only catch what you (or the AI) actually
-think to check for**, and a schema or rule that's underspecified will
+than a hard-coded rule. Therefore, it's not that one tool is smarter
+it's that both approaches only catch what you or the AI actually
+think to check for, and a schema or rule that's underspecified will
 silently drop information no matter which method applies it.
 
 ## Time/effort comparison
 
-Writing and debugging the four regex date patterns took noticeably
+Writing and debugging the four regex date patterns took 
 longer than writing the one-paragraph AI prompt. Most of that time went
 into inspecting every unique date format in the file by hand before
 writing the pattern, not the regex syntax itself. The AI prompt
 produced a usable table almost immediately, but matching its output
-fields to the regex script's (and specifically deciding how to handle
-the sex/blank distinction and the asterisk) took a second pass of
-back-and-forth refinement — once that's counted, total time was close
+fields to the regex script's and deciding how to handle
+the sex/blank distinction and the asterisk took a second proccess of
+back-and-forth  once that's counted, total time was close
 to even.
 
 ## Failure modes (specific records)
@@ -93,11 +90,11 @@ resolved silently rather than flagged.
 
 Neither one blindly. Regex is reliable, but only because it was tuned
 after manually inspecting every date format and category value in this
-file — its correctness comes from that inspection, not from regex
+file its correctness comes from that inspection, not from regex
 itself. The AI pass was faster to get a first version and reasoned its
 way correctly through the century ambiguity, but it silently followed
 whatever schema I gave it rather than asking whether that schema could
 represent the data. For a real dataset I'd want both methods plus a
 mandatory plausibility pass on the output (value ranges, future dates,
-unit sanity checks) — that's the step that actually caught the
+unit sanity checks) that's the step that actually caught the
 `mmol/L` problem, and neither method does it on its own.
